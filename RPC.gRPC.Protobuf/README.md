@@ -1,4 +1,4 @@
-# Лабораторная работа №5. RPC. gRPC. Protobuf
+# RPC. gRPC. Protobuf
 
 ### Задание
 > Создать полный глоссарий употребляемых терминов по какой-то области (допустим, Python) и спроектировать доступ к нему в виде  Web API в докер-контейнере по образцу brendanburns/dictionary-server (или в иной форме отчуждения/контейнеризации, допускающей быстрое развёртывание на произвольной платформе).
@@ -19,29 +19,29 @@ API Gateway (шлюз)
 
 *Успешная сборка*
 
- ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Prog-5-LR-5/blob/main/7.png)
+ ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Portfolio/blob/main/RPC.gRPC.Protobuf/7.png)
 
- ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Prog-5-LR-5/blob/main/1.png)
+ ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Portfolio/blob/main/RPC.gRPC.Protobuf/1.png)
 
  
 **Примеры работы**
 
 Health check
 
- ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Prog-5-LR-5/blob/main/5.png)
+ ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Portfolio/blob/main/RPC.gRPC.Protobuf/5.png)
 
 Поиск термина "gRPC"
 
-  ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Prog-5-LR-5/blob/main/4.png)
+  ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Portfolio/blob/main/RPC.gRPC.Protobuf/4.png)
 
 Список всех терминов
 
- ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Prog-5-LR-5/blob/main/2.png)
+ ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Portfolio/blob/main/RPC.gRPC.Protobuf/2.png)
 
 Поиск первого термина
 
- ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Prog-5-LR-5/blob/main/3.png)
+ ![Лабораторная работа 5](https://github.com/Stepanova-Anna/Portfolio/blob/main/RPC.gRPC.Protobuf/3.png)
 
 Потоковая передача терминов (SSE)
 
-![Лабораторная работа 5](https://github.com/Stepanova-Anna/Prog-5-LR-5/blob/main/6.png)
+![Лабораторная работа 5](https://github.com/Stepanova-Anna/Portfolio/blob/main/RPC.gRPC.Protobuf/6.png)
