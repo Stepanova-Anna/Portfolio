@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отслеживание курсов валют</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .currency-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .currency-table th,
+        .currency-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .currency-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .currency-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .currency-code {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .currency-rate {
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+
+        .last-update {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+
+        .observer-info {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .control-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #connect-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #disconnect-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Отслеживание курсов валют ЦБ РФ</h1>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>ID наблюдателя</h3>
+                <p id="observer-id" style="font-size: 24px; font-weight: bold;">Не подключен</p>
+            </div>
+            <div class="stat-card">
+                <h3>Статус</h3>
+                <span id="connection-status" class="status disconnected">Отключен</span>
+            </div>
+        </div>
+
+        <table class="currency-table">
+            <thead>
+                <tr>
+                    <th>Код</th>
+                    <th>Курс (RUB)</th>
+                    <th>Название</th>
+                </tr>
+            </thead>
+            <tbody id="currency-data">
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 40px;">Загрузка данных...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="last-update">
+            <h3>Последнее обновление: <span id="last-update">—</span></h3>
+        </div>
+
+        <div class="control-buttons">
+            <button id="connect-btn" onclick="connectWebSocket()">Подключиться</button>
+            <button id="disconnect-btn" onclick="disconnectWebSocket()" disabled>Отключиться</button>
+        </div>
+
+        <div class="info">
+            <p><strong>Информация:</strong> Данные обновляются каждые 30 секунд с сайта ЦБ РФ.</p>
+            <p>Валюты: USD (Доллар США), EUR (Евро), GBP (Фунт стерлингов), CNY (Китайский юань), JPY (Японская йена), RUB (Российский рубль)</p>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let observerId = null;
+
+        const currencyNames = {
+            'USD': 'Доллар США',
+            'EUR': 'Евро',
+            'GBP': 'Фунт стерлингов',
+            'CNY': 'Китайский юань',
+            'JPY': 'Японская йена',
+            'RUB': 'Российский рубль'
+        };
+
+        function connectWebSocket() {
+            if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+                console.log('Уже подключен или подключается');
+                return;
+            }
+
+
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+
+            console.log('Подключение к:', wsUrl);
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                console.log('WebSocket соединение установлено');
+                updateConnectionStatus(true);
+                document.getElementById('connect-btn').disabled = true;
+                document.getElementById('disconnect-btn').disabled = false;
+            };
+
+            ws.onclose = function(event) {
+                console.log('WebSocket соединение закрыто, код:', event.code, 'причина:', event.reason);
+                updateConnectionStatus(false);
+                document.getElementById('connect-btn').disabled = false;
+                document.getElementById('disconnect-btn').disabled = true;
+                observerId = null;
+            };
+
+            ws.onerror = function(error) {
+                console.error('WebSocket ошибка:', error);
+                updateConnectionStatus(false);
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    console.log('Получены данные:', data);
+
+                    if (data.type === 'connection_established') {
+                        observerId = data.observer_id;
+                        document.getElementById('observer-id').textContent = observerId;
+                        console.log(`ID наблюдателя: ${observerId}`);
+                    } else if (data.type === 'currency_update') {
+                        updateCurrencyTable(data.data);
+                    }
+                } catch (e) {
+                    console.error('Ошибка парсинга JSON:', e, 'Полученные данные:', event.data);
+                }
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connection-status');
+            const statusText = document.getElementById('connection-status');
+
+            if (connected) {
+                statusText.textContent = 'Подключен';
+                statusElement.className = 'status connected';
+            } else {
+                statusText.textContent = 'Отключен';
+                statusElement.className = 'status disconnected';
+            }
+        }
+
+        function updateCurrencyTable(data) {
+            const tbody = document.getElementById('currency-data');
+            const currencies = data.currencies || {};
+            const timestamp = data.timestamp || '—';
+
+
+            document.getElementById('last-update').textContent = timestamp;
+
+
+            tbody.innerHTML = '';
+
+
+            const sortedCurrencies = Object.entries(currencies).sort(([codeA], [codeB]) => {
+                const order = ['USD', 'EUR', 'GBP', 'CNY', 'JPY', 'RUB'];
+                return order.indexOf(codeA) - order.indexOf(codeB);
+            });
+
+
+            if (sortedCurrencies.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 3;
+                cell.style.textAlign = 'center';
+                cell.style.padding = '40px';
+                cell.textContent = 'Данные о курсах валют отсутствуют';
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+
+
+            sortedCurrencies.forEach(([code, rate]) => {
+                const row = document.createElement('tr');
+
+                const codeCell = document.createElement('td');
+                codeCell.className = 'currency-code';
+                codeCell.textContent = code;
+
+                const rateCell = document.createElement('td');
+                rateCell.className = 'currency-rate';
+                rateCell.textContent = code === 'RUB' ? '1.00' : rate.toFixed(2);
+
+                const nameCell = document.createElement('td');
+                nameCell.textContent = currencyNames[code] || code;
+
+                row.appendChild(codeCell);
+                row.appendChild(rateCell);
+                row.appendChild(nameCell);
+
+                tbody.appendChild(row);
+            });
+        }
+
+
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Страница загружена, подключаемся к WebSocket...');
+            connectWebSocket();
+
+            // Автоматическое переподключение при потере соединения
+            setInterval(function() {
+                if (ws && ws.readyState === WebSocket.CLOSED) {
+                    console.log('Попытка переподключения...');
+                    connectWebSocket();
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
