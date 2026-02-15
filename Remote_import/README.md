@@ -1,4 +1,4 @@
-# Лабораторная работа 1. Реализация удаленного импорта
+# Реализация удаленного импорта
 ## Задание:
 >Разместите представленный ниже код локально на компьютере и реализуйте механизм удаленного импорта. Продемонстрируйте в виде скринкаста или в текстовом отчете с несколькими скриншотами работу удаленного импорта.
 
@@ -44,9 +44,9 @@ sys.path.append("http://localhost:8000")
 
 **Локальный импорт:**
 
-![Лабораторная работа 1. Задание 1](https://github.com/Stepanova-Anna/Programming-3/blob/main/LR1-5sem/7.png)
+![Лабораторная работа 1. Задание 1](https://github.com/Stepanova-Anna/Portfolio/blob/main/Remote_import/7.png)
 
-![Лабораторная работа 1. Задание 1](https://github.com/Stepanova-Anna/Programming-3/blob/main/LR1-5sem/6.png)
+![Лабораторная работа 1. Задание 1](https://github.com/Stepanova-Anna/Portfolio/blob/main/Remote_import/6.png)
 
 -------
 
@@ -54,7 +54,7 @@ sys.path.append("http://localhost:8000")
 
 ### [Repl.it](https://replit.com/@stepanna/LR1-prog-5)
 
-![Лабораторная работа 1. Задание 1](https://github.com/Stepanova-Anna/Programming-3/blob/main/LR1-5sem/8.png)
+![Лабораторная работа 1. Задание 1](https://github.com/Stepanova-Anna/Portfolio/blob/main/Remote_import/8.png)
 
 > Переписать содержимое функции url_hook, класса URLLoader с помощью модуля requests
 
