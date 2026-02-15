@@ -1,0 +1,39 @@
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - glossary-network
+
+  glossary-service:
+    build: ./glossary-service
+    ports:
+      - "50051:50051"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - glossary-network
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - glossary-service
+    environment:
+      - GRPC_SERVER=glossary-service:50051
+    networks:
+      - glossary-network
+
+volumes:
+  redis_data:
+
+networks:
+  glossary-network:
+    driver: bridge

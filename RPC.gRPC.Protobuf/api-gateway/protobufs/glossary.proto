@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package glossary;
+
+service GlossaryService {
+    // Получить термин по ID
+    rpc GetTerm (TermRequest) returns (Term) {}
+
+    // Получить все термины
+    rpc GetAllTerms (Empty) returns (TermList) {}
+
+    // Поиск терминов по названию
+    rpc SearchTerms (SearchRequest) returns (TermList) {}
+
+    // Добавить новый термин
+    rpc AddTerm (AddTermRequest) returns (OperationResponse) {}
+
+    // Удалить термин
+    rpc DeleteTerm (TermRequest) returns (OperationResponse) {}
+
+    // Потоковая передача терминов (streaming)
+    rpc StreamTerms (StreamRequest) returns (stream Term) {}
+}
+
+message Term {
+    string id = 1;
+    string name = 2;
+    string definition = 3;
+    string category = 4;
+    repeated string examples = 5;
+    repeated string synonyms = 6;
+    string created_at = 7;
+    string updated_at = 8;
+}
+
+message TermRequest {
+    string id = 1;
+}
+
+message SearchRequest {
+    string query = 1;
+    string category = 2;
+    int32 limit = 3;
+}
+
+message AddTermRequest {
+    string name = 1;
+    string definition = 2;
+    string category = 3;
+    repeated string examples = 4;
+    repeated string synonyms = 5;
+}
+
+message TermList {
+    repeated Term terms = 1;
+    int32 total_count = 2;
+}
+
+message OperationResponse {
+    bool success = 1;
+    string message = 2;
+    string term_id = 3;
+}
+
+message StreamRequest {
+    string category = 1;
+    int32 batch_size = 2;
+}
+
+message Empty {}
