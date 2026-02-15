@@ -31,9 +31,9 @@
 - Запускается на порту 8888
 
   
-![Лабораторная работа 6](https://github.com/Stepanova-Anna/Programming-3/blob/main/LR6-5sem/1.png)
+![Лабораторная работа 6](https://github.com/Stepanova-Anna/Portfolio/blob/main/Observer/1.png)
 
-![Лабораторная работа 6](https://github.com/Stepanova-Anna/Programming-3/blob/main/LR6-5sem/2.png)
+![Лабораторная работа 6](https://github.com/Stepanova-Anna/Portfolio/blob/main/Observer/2.png)
 
 Паттерн "Наблюдатель"
 - CurrencySubject - управляет наблюдателями и уведомляет их
